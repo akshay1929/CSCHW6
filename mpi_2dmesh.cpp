@@ -377,8 +377,20 @@ sendStridedBuffer(float *srcBuf,
       int fromRank, int toRank ) 
 {
    int msgTag = 0;
-
-   //
+   int baseDims[2] = {srcHeight, srcWidth};
+   int subDims[2] = {sendHeight, sendWidth};
+   int subOffset[2] = {srcOffsetRow, srcOffsetColumn};
+   int ndims = 2;
+   MPI_Datatype mysubarray;
+   // row-major (MPI_ORDER_C)
+   // column major (MPI_ORDER_FORTRAN)
+   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_INT, &mysubarray);
+   MPI_Type_commit(&mysubarray);
+   
+   //MPI_Send(buffer, length, newDataTypeVar, destRank, tag, comm)
+   MPI_Send(srcBuf, 1, mysubarray, toRank, msgTag, MPI_COMM_WORLD);
+   
+   MPI_Type_free(&subarray);
    // ADD YOUR CODE HERE
    // That performs sending of  data using MPI_Send(), going "fromRank" and to "toRank". The
    // data to be sent is in srcBuf, which has width srcWidth, srcHeight.
@@ -386,7 +398,7 @@ sendStridedBuffer(float *srcBuf,
    // sendWidth by sendHeight values, and the subregion is offset from the origin of
    // srcBuf by the values specificed by srcOffsetColumn, srcOffsetRow.
    //
-
+   
 }
 
 void
@@ -398,8 +410,12 @@ recvStridedBuffer(float *dstBuf,
 
    int msgTag = 0;
    int recvSize[2];
+   int subDims[2] = {expectedHeight, expectedWidth};
+   int count;
    MPI_Status stat;
 
+   MPI_Recv(&dstBuf[0], subDims[0]*subDims[1], MPI_INT, 0, msgTag, MPI_COMM_WORLD, &stat);
+   MPI_Get_count(&stat, MPI_INT, &count);
    //
    // ADD YOUR CODE HERE
    // That performs receiving of data using MPI_Recv(), coming "fromRank" and destined for
@@ -417,6 +433,38 @@ recvStridedBuffer(float *dstBuf,
 // suggest using your cpu code from HW5, no OpenMP parallelism 
 //
 
+float
+sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
+{
+   float t=0.0;
+   float Gx = 0.0;
+   float Gy = 0.0;
+   // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
+   // of input s, returning a float
+   for (int x = 0; x < 3; x++) {
+      for (int y = 0; y < 3; y++) {
+         Gx += gx[x * 3 + y] * s[(i + y - 1) * ncols + (j + y - 1)];
+         Gy += gy[x * 3 + y] * s[(i + y - 1) * ncols + (j + y - 1)];
+      }
+   }
+   t = sqrt((Gx * Gx) + (Gy * Gy));
+
+   return t;
+}
+void
+do_sobel_filtering(float *in, float *out, int ncols, int nrows)
+{
+   float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
+   float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
+
+   // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
+   // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
+   for (int i = 0; i < nrows; i++) {
+      for (int j = 0; j < ncols; j++) {
+         out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+      }
+   }
+}
 
 void
 sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
@@ -437,8 +485,9 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
             // v2. copy the input to the output, umodified
          //   std::copy(t->inputBuffer.begin(), t->inputBuffer.end(), t->outputBuffer.begin());
 #endif
-         // ADD YOUR CODE HERE
-         // to call your sobel filtering code on each tile
+            // ADD YOUR CODE HERE
+            // to call your sobel filtering code on each tile
+            do_sobel_filtering(t->inputBuffer, t->outputBuffer, col, row);
          }
       }
    }
