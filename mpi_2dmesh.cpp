@@ -377,7 +377,7 @@ sendStridedBuffer(float *srcBuf,
       int fromRank, int toRank ) 
 {
    
-   // int msgTag = 0;
+   int msgTag = 0;
    // int baseDims[2] = {srcHeight, srcWidth};
    // int subDims[2] = {sendHeight, sendWidth};
    // int subOffset[2] = {srcOffsetRow, srcOffsetColumn};
