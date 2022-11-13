@@ -410,25 +410,34 @@ recvStridedBuffer(float *dstBuf,
       int fromRank, int toRank ) {
 
    int msgTag = 0;
-   int subDims[2] = {expectedHeight, expectedWidth};
-   float temp[subDims[0]*subDims[1]];
+   // int subDims[2] = {expectedHeight, expectedWidth};
+   // float temp[subDims[0]*subDims[1]];
    int recvSize[2];
-   int baseDims[2] = {dstHeight, dstWidth};
+   // int baseDims[2] = {dstHeight, dstWidth};
    
-   int subOffset[2] = {dstOffsetRow, dstOffsetColumn};
-   int ndims = 2;
-   int count;
+   // int subOffset[2] = {dstOffsetRow, dstOffsetColumn};
+   // int ndims = 2;
+   // int count;
    MPI_Status stat;
    // MPI_Datatype mysubarray;
    // MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
    // MPI_Type_commit(&mysubarray);
 
-   MPI_Recv(&temp[0], subDims[0]*subDims[1], MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
-   dstBuf[dstOffsetRow * dstWidth + dstOffsetColumn] = temp[0];
+   //MPI_Recv(&temp[0], subDims[0]*subDims[1], MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   //dstBuf[dstOffsetRow * dstWidth + dstOffsetColumn] = temp[0];
    //MPI_Recv(dstBuf, mysubarray, MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    //MPI_Recv(dstBuf, 1, mysubarray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
-   MPI_Get_count(&stat, MPI_INT, &count);
+   //MPI_Get_count(&stat, MPI_INT, &count);
    //MPI_Type_free(&mysubarray);
+   
+   MPI_Datatype result;
+   MPI_Type_vector(expectedHeight, expectedWidth, dstWidth, MPI_FLOAT, &result);
+   MPI_Type_commit(&result);
+
+   int offSet = dstOffsetRow * dstWidth + dstOffsetColumn;
+
+   MPI_Recv(dstBuf + offSet, 1, result, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   
    //
    // ADD YOUR CODE HERE
    // That performs receiving of data using MPI_Recv(), coming "fromRank" and destined for
