@@ -415,7 +415,7 @@ recvStridedBuffer(float *dstBuf,
    int count;
    MPI_Status stat;
 
-   MPI_Recv(&dstBuf[0], subDims[0]*subDims[1], MPI_INT, 0, msgTag, MPI_COMM_WORLD, &stat);
+   MPI_Recv(&dstBuf[0], subDims[0]*subDims[1], MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    MPI_Get_count(&stat, MPI_INT, &count);
    //
    // ADD YOUR CODE HERE
