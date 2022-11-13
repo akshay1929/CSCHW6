@@ -461,9 +461,9 @@ recvStridedBuffer(float *dstBuf,
 float
 sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
 {
-   float t=0.0f;
-   float Gx = 0.0f;
-   float Gy = 0.0f;
+   float t=0.0;
+   float Gx = 0.0;
+   float Gy = 0.0;
    // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
    // of input s, returning a float
    for (int x = 0; x < 3; x++) {
@@ -472,7 +472,7 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
          Gy += gy[x * 3 + y] * s[(i + y - 1) * ncols + (j + y - 1)];
       }
    }
-   t = sqrtf(Gx*Gx + Gy*Gy);
+   t = sqrt(pow(Gx, 2) + pow(Gy, 2));
 
    return t;
 }
@@ -483,12 +483,12 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
    float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
 
    // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
-   // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
-   for (int i = 0; i < nrows; i++) {
-      for (int j = 0; j < ncols; j++) {
-         out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+   // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output. 
+      for (int i = 0; i < nrows; i++) {
+         for (int j = 0; j < ncols; j++) {
+            out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+         }
       }
-   }
 }
 
 void
