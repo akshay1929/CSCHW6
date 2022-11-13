@@ -410,18 +410,21 @@ recvStridedBuffer(float *dstBuf,
       int fromRank, int toRank ) {
 
    int msgTag = 0;
+   int subDims[2] = {expectedHeight, expectedWidth};
+   float temp[subDims[0]*subDims[1]];
    int recvSize[2];
    int baseDims[2] = {dstHeight, dstWidth};
-   int subDims[2] = {expectedHeight, expectedWidth};
+   
    int subOffset[2] = {dstOffsetRow, dstOffsetColumn};
    int ndims = 2;
    int count;
    MPI_Status stat;
-   MPI_Datatype mysubarray;
-   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
-   MPI_Type_commit(&mysubarray);
+   // MPI_Datatype mysubarray;
+   // MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
+   // MPI_Type_commit(&mysubarray);
 
-   MPI_Recv(&dstBuf[0], subDims[0]*subDims[1], MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   MPI_Recv(&temp[0], subDims[0]*subDims[1], MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   dstBuf[dstOffsetRow * dstWidth + dstOffsetColumn] = temp[0];
    //MPI_Recv(dstBuf, mysubarray, MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    //MPI_Recv(dstBuf, 1, mysubarray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    MPI_Get_count(&stat, MPI_INT, &count);
