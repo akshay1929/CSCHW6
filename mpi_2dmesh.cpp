@@ -424,6 +424,7 @@ recvStridedBuffer(float *dstBuf,
    //MPI_Recv(dstBuf, 1, mysubarray, MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    MPI_Recv(dstBuf, 1, mysubarray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    MPI_Get_count(&stat, MPI_INT, &count);
+   MPI_Type_free(&mysubarray);
    //
    // ADD YOUR CODE HERE
    // That performs receiving of data using MPI_Recv(), coming "fromRank" and destined for
