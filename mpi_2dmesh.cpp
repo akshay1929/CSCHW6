@@ -383,15 +383,18 @@ sendStridedBuffer(float *srcBuf,
    int subOffset[2] = {srcOffsetRow, srcOffsetColumn};
    int ndims = 2;
    MPI_Datatype mysubarray;
-   // row-major (MPI_ORDER_C)
-   // column major (MPI_ORDER_FORTRAN)
-   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
+   // MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
+   // MPI_Type_commit(&mysubarray);
+   // MPI_Send(srcBuf, 1, mysubarray, toRank, msgTag, MPI_COMM_WORLD);
+   // MPI_Type_free(&mysubarray);
+
+   MPI_Type_vector(sendHeight, sendWidth, srcWidth, MPI_FLOAT, &mysubarray);
    MPI_Type_commit(&mysubarray);
-   
-   //MPI_Send(buffer, length, newDataTypeVar, destRank, tag, comm)
-   MPI_Send(srcBuf, 1, &mysubarray, toRank, msgTag, MPI_COMM_WORLD);
-   
-   MPI_Type_free(&mysubarray);
+
+   int offSet = srcOffsetRow * srcWidth + srcOffsetColumn;
+
+   MPI_Send(srcBuf + offSet, 1, mysubarray, toRank, msgTag, MPI_COMM_WORLD);
+
    // ADD YOUR CODE HERE
    // That performs sending of  data using MPI_Send(), going "fromRank" and to "toRank". The
    // data to be sent is in srcBuf, which has width srcWidth, srcHeight.
