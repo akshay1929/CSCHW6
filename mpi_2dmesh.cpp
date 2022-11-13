@@ -411,11 +411,17 @@ recvStridedBuffer(float *dstBuf,
 
    int msgTag = 0;
    int recvSize[2];
+   int baseDims[2] = {dstHeight, dstWidth};
    int subDims[2] = {expectedHeight, expectedWidth};
+   int subOffset[2] = {dstOffsetRow, dstOffsetColumn};
+   int ndims = 2;
    int count;
    MPI_Status stat;
+   MPI_Datatype mysubarray;
+   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_INT, &mysubarray);
+   MPI_Type_commit(&mysubarray);
 
-   MPI_Recv(&dstBuf[0], subDims[0]*subDims[1], MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   MPI_Recv(dstBuf, mysubarray, MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    MPI_Get_count(&stat, MPI_INT, &count);
    //
    // ADD YOUR CODE HERE
