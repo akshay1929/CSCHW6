@@ -377,11 +377,11 @@ sendStridedBuffer(float *srcBuf,
       int fromRank, int toRank ) 
 {
    
-   int msgTag = 0;
-   int baseDims[2] = {srcHeight, srcWidth};
-   int subDims[2] = {sendHeight, sendWidth};
-   int subOffset[2] = {srcOffsetRow, srcOffsetColumn};
-   int ndims = 2;
+   // int msgTag = 0;
+   // int baseDims[2] = {srcHeight, srcWidth};
+   // int subDims[2] = {sendHeight, sendWidth};
+   // int subOffset[2] = {srcOffsetRow, srcOffsetColumn};
+   // int ndims = 2;
    MPI_Datatype mysubarray;
    // MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
    // MPI_Type_commit(&mysubarray);
@@ -461,9 +461,9 @@ recvStridedBuffer(float *dstBuf,
 float
 sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
 {
-   float t=0.0;
-   float Gx = 0.0;
-   float Gy = 0.0;
+   float t=0.0f;
+   float Gx = 0.0f;
+   float Gy = 0.0f;
    // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
    // of input s, returning a float
    for (int x = 0; x < 3; x++) {
