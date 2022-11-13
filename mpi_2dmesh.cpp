@@ -472,7 +472,7 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
          Gy += gy[x * 3 + y] * s[(i + y - 1) * ncols + (j + y - 1)];
       }
    }
-   t = sqrt((Gx * Gx) + (Gy * Gy));
+   t = sqrtf(Gx*Gx + Gy*Gy);
 
    return t;
 }
