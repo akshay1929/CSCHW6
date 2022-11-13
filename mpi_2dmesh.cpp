@@ -376,6 +376,7 @@ sendStridedBuffer(float *srcBuf,
       int sendWidth, int sendHeight, 
       int fromRank, int toRank ) 
 {
+   
    int msgTag = 0;
    int baseDims[2] = {srcHeight, srcWidth};
    int subDims[2] = {sendHeight, sendWidth};
@@ -388,7 +389,7 @@ sendStridedBuffer(float *srcBuf,
    MPI_Type_commit(&mysubarray);
    
    //MPI_Send(buffer, length, newDataTypeVar, destRank, tag, comm)
-   MPI_Send(srcBuf, 1, mysubarray, 1, msgTag, MPI_COMM_WORLD);
+   MPI_Send(srcBuf, 1, mysubarray, toRank, msgTag, MPI_COMM_WORLD);
    
    MPI_Type_free(&mysubarray);
    // ADD YOUR CODE HERE
@@ -487,7 +488,7 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 #endif
             // ADD YOUR CODE HERE
             // to call your sobel filtering code on each tile
-            do_sobel_filtering(&t->inputBuffer[row], &t->outputBuffer[row], col, row);
+            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height);
          }
       }
    }
