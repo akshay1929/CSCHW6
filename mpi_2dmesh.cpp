@@ -385,7 +385,7 @@ sendStridedBuffer(float *srcBuf,
    MPI_Datatype mysubarray;
    // row-major (MPI_ORDER_C)
    // column major (MPI_ORDER_FORTRAN)
-   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_INT, &mysubarray);
+   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
    MPI_Type_commit(&mysubarray);
    
    //MPI_Send(buffer, length, newDataTypeVar, destRank, tag, comm)
@@ -418,7 +418,7 @@ recvStridedBuffer(float *dstBuf,
    int count;
    MPI_Status stat;
    MPI_Datatype mysubarray;
-   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_INT, &mysubarray);
+   MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
    MPI_Type_commit(&mysubarray);
 
    //MPI_Recv(dstBuf, 1, mysubarray, MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
