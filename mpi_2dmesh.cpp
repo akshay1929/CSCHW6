@@ -421,8 +421,8 @@ recvStridedBuffer(float *dstBuf,
    MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
    MPI_Type_commit(&mysubarray);
 
-   //MPI_Recv(&dstBuf[0], subDims[0]*subDims[1], MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
-   MPI_Recv(dstBuf, mysubarray, MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   MPI_Recv(dstBuf[, subDims[0]*subDims[1], MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   //MPI_Recv(dstBuf, mysubarray, MPI_INT, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    //MPI_Recv(dstBuf, 1, mysubarray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
    MPI_Get_count(&stat, MPI_INT, &count);
    MPI_Type_free(&mysubarray);
