@@ -382,18 +382,18 @@ sendStridedBuffer(float *srcBuf,
    // int subDims[2] = {sendHeight, sendWidth};
    // int subOffset[2] = {srcOffsetRow, srcOffsetColumn};
    // int ndims = 2;
-   MPI_Datatype mysubarray;
+   MPI_Datatype result;
    // MPI_Type_create_subarray(ndims, baseDims, subDims, subOffset, MPI_ORDER_C, MPI_FLOAT, &mysubarray);
    // MPI_Type_commit(&mysubarray);
    // MPI_Send(srcBuf, 1, mysubarray, toRank, msgTag, MPI_COMM_WORLD);
    // MPI_Type_free(&mysubarray);
 
-   MPI_Type_vector(sendHeight, sendWidth, srcWidth, MPI_FLOAT, &mysubarray);
-   MPI_Type_commit(&mysubarray);
+   MPI_Type_vector(sendHeight, sendWidth, srcWidth, MPI_FLOAT, &result);
+   MPI_Type_commit(&result);
 
    int offSet = srcOffsetRow * srcWidth + srcOffsetColumn;
 
-   MPI_Send(srcBuf + offSet, 1, mysubarray, toRank, msgTag, MPI_COMM_WORLD);
+   MPI_Send(srcBuf + offSet, 1, result, toRank, msgTag, MPI_COMM_WORLD);
 
    // ADD YOUR CODE HERE
    // That performs sending of  data using MPI_Send(), going "fromRank" and to "toRank". The
@@ -465,7 +465,7 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
    float Gy = 0.0;
    // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
    // of input s, returning a float
-   if (i > 0 && i < nrows - 1 && j > 0 && j < ncols - 1) {
+   if (i > 0 && i < nrows - 1 && j > 0 && j < ncols - 1) { //Prevent segment fault
       for (int x = 0; x < 3; x++) {
          for (int y = 0; y < 3; y++) {
             Gx += gx[x * 3 + y] * s[(i + x - 1) * ncols + (j + y - 1)];
