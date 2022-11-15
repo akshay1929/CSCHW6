@@ -42,7 +42,10 @@
 
 #define DEBUG_TRACE 0 
 
+//Counting total messages sent
 int messagesNum = 0;
+
+//Calculating total data moved between ranks
 double dataMoved = 0.0;
 
 int
@@ -491,7 +494,6 @@ recvStridedBuffer(float *dstBuf,
 float
 sobel_filtered_pixel(float *s, int i, int j , float *gx, float *gy, int xmax, int xmin, int ymax, int ymin)
 {
-   int w = xmax - xmin;
    float t=0.0;
    float Gx = 0.0;
    float Gy = 0.0;
@@ -500,8 +502,8 @@ sobel_filtered_pixel(float *s, int i, int j , float *gx, float *gy, int xmax, in
    if (i > ymin && i < ymax - 1 && j > xmin && j < xmax - 1) { //Prevent segment fault
       for (int x = 0; x < 3; x++) {
          for (int y = 0; y < 3; y++) {
-            Gx += gx[x * 3 + y] * s[(i - ymin + x - 1) * w + (j - xmin + y - 1)];
-            Gy += gy[x * 3 + y] * s[(i - ymin + x - 1) * w + (j - xmin + y - 1)];
+            Gx += gx[x * 3 + y] * s[(i - ymin + x - 1) * (xmax - xmin) + (j - xmin + y - 1)];
+            Gy += gy[x * 3 + y] * s[(i - ymin + x - 1) * (xmax - xmin) + (j - xmin + y - 1)];
          }
       }
    }
@@ -545,6 +547,7 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 #endif
             // ADD YOUR CODE HERE
             // to call your sobel filtering code on each tile
+            // Additional parameters sent for halo cells
             do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height, t->ghost_xmax, t->ghost_xmin, t->ghost_ymax, t->ghost_ymin);
          }
       }
@@ -564,6 +567,7 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
       {  
          Tile2D *t = &(tileArray[row][col]);
 
+         //Calculation for ghost values of tiles
          int ghostH = t->ghost_ymax - t->ghost_ymin;
          int ghostW = t->ghost_xmax - t->ghost_xmin;
 
@@ -590,6 +594,7 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                printf("scatterAllTiles() send side: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d \n", t->tileRank, myrank, t->inputBuffer.size());
 #endif
 
+               //Update offset value
                int offSetColumn = t->xloc + t->ghost_xmin;
                int offSetRow = t->yloc + t->ghost_ymin;
                sendStridedBuffer(s, // ptr to the buffer to send
