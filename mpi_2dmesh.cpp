@@ -154,7 +154,7 @@ computeMeshDecomposition(AppState *as, vector < vector < Tile2D > > *tileArray) 
             t.ghost_ymin = 0;
          }
          else {
-            t.ghost_ymin = -1;
+            t.ghost_ymin = 1;
          }
          if (i == ytiles - 1) {
             t.ghost_ymax = height;
@@ -590,7 +590,8 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                int offSetC = t->xloc + t->ghost_xmin;
                int offSetR = t->yloc + t->ghost_ymin;
 
-               off_t s_offset = offSetC * global_width + offSetR, d_offset=0;
+               off_t s_offset = offSetC * global_width + offSetR; 
+               off_t d_offset=0;
                float *d = t->inputBuffer.data();
 
                for (int j=0;j<ghostH;j++, s_offset+=global_width, d_offset+=ghostW)
