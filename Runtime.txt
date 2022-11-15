@@ -31,6 +31,9 @@ Timing results from rank 0:
 	Scatter time:	51.3295 (ms) 
 	Sobel time:	43.7241 (ms) 
 	Gather time:	33.9201 (ms) 
+
+
+
  srun -n 9 ./mpi_2dmesh -i ../data/zebra-gray-int8-4x -x 7112 -y 5146 -g 1  
 Hello world, I'm rank 8 of 9 total ranks running on <nid005509>
 Hello world, I'm rank 4 of 9 total ranks running on <nid005507>
@@ -79,6 +82,9 @@ Timing results from rank 0:
 	Scatter time:	56.2163 (ms) 
 	Sobel time:	20.0675 (ms) 
 	Gather time:	31.4490 (ms) 
+
+
+
  srun -n 16 ./mpi_2dmesh -i ../data/zebra-gray-int8-4x -x 7112 -y 5146 -g 1  
 Hello world, I'm rank 6 of 16 total ranks running on <nid005507>
 Hello world, I'm rank 14 of 16 total ranks running on <nid005509>
@@ -148,6 +154,10 @@ Timing results from rank 0:
 	Sobel time:	11.3446 (ms) 
 	Gather time:	42.2833 (ms) 
 Hello world, I'm rank 8 of 16 total ranks running on <nid005508>
+
+
+
+
  srun -n 25 ./mpi_2dmesh -i ../data/zebra-gray-int8-4x -x 7112 -y 5146 -g 1  
 Hello world, I'm rank 8 of 25 total ranks running on <nid005507>
 Hello world, I'm rank 10 of 25 total ranks running on <nid005507>
@@ -244,6 +254,10 @@ Hello world, I'm rank 17 of 25 total ranks running on <nid005508>
 Hello world, I'm rank 14 of 25 total ranks running on <nid005508>
 Hello world, I'm rank 15 of 25 total ranks running on <nid005508>
 Hello world, I'm rank 16 of 25 total ranks running on <nid005508>
+
+
+
+
  srun -n 36 ./mpi_2dmesh -i ../data/zebra-gray-int8-4x -x 7112 -y 5146 -g 1  
 Hello world, I'm rank 5 of 36 total ranks running on <nid005506>
 Hello world, I'm rank 2 of 36 total ranks running on <nid005506>
@@ -373,6 +387,10 @@ Hello world, I'm rank 12 of 36 total ranks running on <nid005507>
 Hello world, I'm rank 11 of 36 total ranks running on <nid005507>
 Hello world, I'm rank 9 of 36 total ranks running on <nid005507>
 Hello world, I'm rank 17 of 36 total ranks running on <nid005507>
+
+
+
+
  srun -n 49 ./mpi_2dmesh -i ../data/zebra-gray-int8-4x -x 7112 -y 5146 -g 1  
 Hello world, I'm rank 44 of 49 total ranks running on <nid005509>
 Hello world, I'm rank 35 of 49 total ranks running on <nid005508>
@@ -541,6 +559,11 @@ Timing results from rank 0:
 	Gather time:	51.0629 (ms) 
 Hello world, I'm rank 19 of 49 total ranks running on <nid005507>
 Hello world, I'm rank 36 of 49 total ranks running on <nid005508>
+
+
+
+
+
  srun -n 64 ./mpi_2dmesh -i ../data/zebra-gray-int8-4x -x 7112 -y 5146 -g 1  
 Hello world, I'm rank 23 of 64 total ranks running on <nid005507>
 Hello world, I'm rank 34 of 64 total ranks running on <nid005508>
@@ -754,6 +777,11 @@ Timing results from rank 0:
 	Sobel time:	3.0808 (ms) 
 	Gather time:	73.3146 (ms) 
 Hello world, I'm rank 13 of 64 total ranks running on <nid005506>
+
+
+
+
+
  srun -n 81 ./mpi_2dmesh -i ../data/zebra-gray-int8-4x -x 7112 -y 5146 -g 1  
 Hello world, I'm rank 1 of 81 total ranks running on <nid005506>
 Hello world, I'm rank 2 of 81 total ranks running on <nid005506>
