@@ -150,6 +150,21 @@ computeMeshDecomposition(AppState *as, vector < vector < Tile2D > > *tileArray) 
          int width =  as->global_mesh_size[0];
          int height = ylocs[i+1]-ylocs[i];
          Tile2D t = Tile2D(0, ylocs[i], width, height, i);
+         if (i == 0) {
+            t.ghost_ymin = 0;
+         }
+         else {
+            t.ghost_ymin = -1;
+         }
+         if (i == ytiles - 1) {
+            t.ghost_ymax = height;
+         }
+         else {
+            t.ghost_ymax = height + 1;
+         }
+         t.ghost_xmax = width;
+         t.ghost_xmin = 0;
+
          tiles.push_back(t);
          tileArray->push_back(tiles);
       }
@@ -458,18 +473,19 @@ recvStridedBuffer(float *dstBuf,
 // suggest using your cpu code from HW5, no OpenMP parallelism 
 //
 float
-sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
+sobel_filtered_pixel(float *s, int i, int j , float *gx, float *gy, int xmax, int xmin, int ymax, int ymin)
 {
+   int w = xmax - xmin;
    float t=0.0;
    float Gx = 0.0;
    float Gy = 0.0;
    // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
    // of input s, returning a float
-   if (i > 0 && i < nrows - 1 && j > 0 && j < ncols - 1) { //Prevent segment fault
+   if (i > ymin && i < ymax - 1 && j > xmin && j < xmax - 1) { //Prevent segment fault
       for (int x = 0; x < 3; x++) {
          for (int y = 0; y < 3; y++) {
-            Gx += gx[x * 3 + y] * s[(i + x - 1) * ncols + (j + y - 1)];
-            Gy += gy[x * 3 + y] * s[(i + x - 1) * ncols + (j + y - 1)];
+            Gx += gx[x * 3 + y] * s[(i - ymin + x - 1) * w + (j - xmin + y - 1)];
+            Gy += gy[x * 3 + y] * s[(i - ymin + x - 1) * w + (j - xmin + y - 1)];
          }
       }
    }
@@ -478,7 +494,7 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
    return t;
 }
 void
-do_sobel_filtering(float *in, float *out, int ncols, int nrows)
+do_sobel_filtering(float *in, float *out, int ncols, int nrows, int xmax, int xmin, int ymax, int ymin)
 {
    float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
    float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
@@ -487,7 +503,7 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
    // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output. 
       for (int i = 0; i < nrows; i++) {
          for (int j = 0; j < ncols; j++) {
-            out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+            out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy, xmax, xmin, ymax, ymin);
          }
       }
 }
@@ -532,20 +548,23 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
       {  
          Tile2D *t = &(tileArray[row][col]);
 
+         int ghostH = t->ghost_ymax - t->ghost_ymin;
+         int ghostW = t->ghost_xmax - t->ghost_xmin;
+
          if (myrank != 0 && t->tileRank == myrank)
          {
             int fromRank=0;
 
             // receive a tile's buffer 
-            t->inputBuffer.resize(t->width*t->height);
+            t->inputBuffer.resize(ghostH * ghostW);
             t->outputBuffer.resize(t->width*t->height);
 #if DEBUG_TRACE
             printf("scatterAllTiles() receive side:: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d, t->outputBuffersize()=%d \n", t->tileRank, myrank, t->inputBuffer.size(), t->outputBuffer.size());
 #endif
 
-            recvStridedBuffer(t->inputBuffer.data(), t->width, t->height,
+            recvStridedBuffer(t->inputBuffer.data(), ghostW, ghostH,
                   0, 0,  // offset into the tile buffer: we want the whole thing
-                  t->width, t->height, // how much data coming from this tile
+                  ghostW, ghostH, // how much data coming from this tile
                   fromRank, myrank); 
          }
          else if (myrank == 0)
@@ -555,23 +574,28 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                printf("scatterAllTiles() send side: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d \n", t->tileRank, myrank, t->inputBuffer.size());
 #endif
 
+               int offSetColumn = t->xloc + t->ghost_xmin;
+               int offSetRow = t->yloc + t->ghost_ymin;
                sendStridedBuffer(s, // ptr to the buffer to send
                      global_width, global_height,  // size of the src buffer
-                     t->xloc, t->yloc, // offset into the send buffer
-                     t->width, t->height,  // size of the buffer to send,
+                     offSetColumn, offSetRow, // offset into the send buffer
+                     ghostW, ghostH,  // size of the buffer to send,
                      myrank, t->tileRank);
             }
             else // rather then have rank 0 send to rank 0, just do a strided copy into a tile's input buffer
             {
-               t->inputBuffer.resize(t->width*t->height);
+               t->inputBuffer.resize(ghostW * ghostH);
                t->outputBuffer.resize(t->width*t->height);
 
-               off_t s_offset=0, d_offset=0;
+               int offSetC = t->xloc + t->ghost_xmin;
+               int offSetR = t->yloc + t->ghost_ymin;
+
+               off_t s_offset = offSetC * global_width + offSetR, d_offset=0;
                float *d = t->inputBuffer.data();
 
-               for (int j=0;j<t->height;j++, s_offset+=global_width, d_offset+=t->width)
+               for (int j=0;j<ghostH;j++, s_offset+=global_width, d_offset+=ghostW)
                {
-                  memcpy((void *)(d+d_offset), (void *)(s+s_offset), sizeof(float)*t->width);
+                  memcpy((void *)(d+d_offset), (void *)(s+s_offset), sizeof(float)*ghostW);
                }
             }
          }
