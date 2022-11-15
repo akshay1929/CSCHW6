@@ -276,7 +276,7 @@ computeMeshDecomposition(AppState *as, vector < vector < Tile2D > > *tileArray) 
                t.ghost_ymax = height;
             }
             else {
-               t.ghost_ymin = height + 1;
+               t.ghost_ymax = height + 1;
             }
 
             tile_row.push_back(t);
