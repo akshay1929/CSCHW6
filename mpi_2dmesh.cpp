@@ -200,7 +200,7 @@ computeMeshDecomposition(AppState *as, vector < vector < Tile2D > > *tileArray) 
          else {
             t.ghost_xmin = -1;
          }
-         if (i == ytiles - 1) {
+         if (i == xtiles - 1) {
             t.ghost_xmax = width;
          }
          else {
@@ -266,7 +266,7 @@ computeMeshDecomposition(AppState *as, vector < vector < Tile2D > > *tileArray) 
             else {
                t.ghost_ymin = -1;
             }
-            if (i == ytiles - 1) {
+            if (i == xtiles - 1) {
                t.ghost_xmax = width;
             }
             else {
