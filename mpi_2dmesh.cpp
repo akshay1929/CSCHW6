@@ -503,7 +503,7 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows, int xmax, int xm
    // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output. 
       for (int i = 0; i < nrows; i++) {
          for (int j = 0; j < ncols; j++) {
-            out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy, xmax, xmin, ymax, ymin);
+            out[i * ncols + j] = sobel_filtered_pixel(in, i, j, Gx, Gy, xmax, xmin, ymax, ymin);
          }
       }
 }
