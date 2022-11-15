@@ -42,7 +42,7 @@
 
 #define DEBUG_TRACE 0 
 
-int messages = 0;
+int messagesNum = 0;
 double dataMoved = 0.0;
 
 int
@@ -437,7 +437,7 @@ sendStridedBuffer(float *srcBuf,
       int sendWidth, int sendHeight, 
       int fromRank, int toRank ) 
 {
-   messages++;
+   messagesNum++;
    dataMoved += sendHeight * sendWidth * sizeof(srcBuf);
    int msgTag = 0;
    MPI_Datatype result;
@@ -462,7 +462,7 @@ recvStridedBuffer(float *dstBuf,
       int expectedWidth, int expectedHeight, 
       int fromRank, int toRank ) {
 
-   messages++;
+   messagesNum++;
    dataMoved += expectedHeight * expectedWidth * sizeof(dstBuf);
    int msgTag = 0;
    int recvSize[2];
@@ -803,7 +803,7 @@ int main(int ac, char *av[]) {
       printf("\tScatter time:\t%6.4f (ms) \n", elapsed_scatter_time*1000.0);
       printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
       printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
-      printf("\tNumber of messages\t%i \n", messages);
+      printf("\tNumber of messages\t%i \n", messagesNum);
       printf("\tData moved:\t%6.4f \n", dataMoved);
    }
 
